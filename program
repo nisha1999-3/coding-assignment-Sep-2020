@@ -1,0 +1,156 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+/* -------------------MERGE SORT IMPLEMENTATION----------------*/
+
+void merge(int arr[], int l, int m, int r)
+{
+    int n1 = m - l + 1;
+    int n2 = r - m;
+    int L[n1], R[n2];
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[l + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = arr[m + 1 + j];
+
+    int i = 0;
+    int j = 0;
+    int k = l;
+
+    while (i < n1 && j < n2)
+    {
+        if (L[i] <= R[j])
+        {
+            arr[k] = L[i];
+            i++;
+        }
+        else
+        {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1)
+    {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2)
+    {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+
+void mergeSort(int arr[], int l, int r)
+{
+    if (l >= r)
+    {
+        return;
+    }
+    int m = l + (r - l) / 2;
+    mergeSort(arr, l, m);
+    mergeSort(arr, m + 1, r);
+    merge(arr, l, m, r);
+}
+
+/* ------------------------- --------------------------*/
+
+pair<int, string> num_word(string str)
+{
+    int num;
+    string tmp, word;
+
+    stringstream ss;
+    ss << str;
+    while (!ss.eof())
+    {
+        ss >> word;
+        if (stringstream(word) >> num)
+        {
+            break;
+        }
+        else
+        {
+            tmp += word + " ";
+        }
+    }
+
+    return {num, tmp};
+}
+
+int main(void)
+{
+
+    /* ---------------------- READ FROM FILE --------------------- */
+    ifstream infile;
+    infile.open("./sample_input.txt"); //INPUT ARE READ FROM sample_input.txt
+    if (!infile)
+    {
+        cout << "File open error\n";
+        exit(1);
+    }
+
+    char tr[100];
+    infile.getline(tr, 100);
+    pair<int, string> p = num_word(tr);
+
+    int m = p.first;
+
+    infile.getline(tr, 100);
+    infile.getline(tr, 100);
+    infile.getline(tr, 100);
+
+    map<int, string> mp;
+    int a[100];
+
+    int n = 0;
+    while (!infile.eof())
+    {
+        infile.getline(tr, 100);
+        p = num_word(tr);
+        a[n++] = p.first;
+        mp[p.first] = p.second;
+    }
+    /*-----------------------------------------------------------*/
+
+    /* ---------------------- CONTROL LOGIC --------------------- */
+    mergeSort(a, 0, n - 1);
+    m--;
+    int min = INT_MAX;
+    int arr_start = 0, arr_end = 0;
+    for (int i = 0; (i + m) < n; i++)
+    {
+        if (a[i + m] - a[i] < min)
+        {
+            min = a[i + m] - a[i];
+            arr_start = i;
+            arr_end = i + m;
+        }
+    }
+
+    /* ------------------------------------------------------------ */
+
+    /* ------------------------ OUTPUT TO FILE ---------------------*/
+
+    ofstream output;
+    output.open("output.txt");
+
+    output << "The goodies selected for distribution are:\n\n";
+
+    for (int i = arr_start; i <= arr_end; i++)
+    {
+        output<<mp[a[i]]<<a[i]<<"\n";
+    }
+
+    output<<"\n";
+    output<<"And the difference between the chosen goodie with highest price and the lowest price is "<<a[arr_end] - a[arr_start]<<"\n";
+    /* ------------------------------------------------------------- */
+    return 0;
+}
